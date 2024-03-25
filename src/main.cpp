@@ -308,7 +308,7 @@ void moveCood(pros::Gps &gps, std::shared_ptr<OdomChassisController> drive, doub
 	//Then it goes to use that difference and add it to the odometry, and sets that as the point to move towards.
 	//Inches only!!!
 	//https://www.vexforum.com/t/using-okapi-units/83933 convert double to qlength or some other units.
-	pros::c::gps_status_s_t gpsData;
+	pros::c::gps_status_s_t gpsData; //define a strut
 	gpsData = gps.get_status();
 
 	QLength diffX = (targetX-gpsData.x)*1.0_m; //convert meters to inches
