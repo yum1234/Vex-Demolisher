@@ -3,7 +3,7 @@
 using namespace std;
 
 //opcontrol declerations
-void arcade(std::shared_ptr<ChassisController> drive, Controller &controller);
+void arcadeDrive(std::shared_ptr<ChassisController> drive, Controller &controller);
 void flywheelHandling(ControllerButton &flywheelSpinIn, ControllerButton &flywheelSpinOut, Motor &flywheel);
 void intakeHandling(ControllerButton &intakeIn, ControllerButton &intakeOut, Motor &intake);
 void wingHandling(ControllerButton &wingsIn, ControllerButton &wingsOut, Motor &leftWing, Motor &rightWing);
@@ -58,18 +58,18 @@ void initialize() {
 
 	//general
 	ports.intake = 5;
-	ports.flywheel = 6;
-	ports.leftWing = 7;
-	ports.rightWing = 8;
+	ports.flywheel = 7;
+	ports.leftWing = 3;
+	ports.rightWing = 5;
 
 	//chassis
-	ports.topLeftMotor = 1;
-	ports.topRightMotor = 2;
-	ports.bottomRightMotor = 3;
-	ports.bottomLeftMotor = 4;
+	ports.topLeftMotor = 2;
+	ports.topRightMotor = 9;
+	ports.bottomRightMotor = 10;
+	ports.bottomLeftMotor = 1;
 
 	//sensors
-	ports.gps = 9;
+	ports.gps = 11;
 
 	//for lcd screen
 	pros::lcd::initialize();
@@ -209,7 +209,7 @@ void opcontrol() {
 
 	//main loop
 	while (true) {
-		arcade(drive, controller);
+		arcadeDrive(drive, controller);
 		flywheelHandling(flywheelSpinIn, flywheelSpinOut, flywheel); 
 		intakeHandling(intakeIn, intakeOut, intake);
 		wingHandling(wingsIn, wingsOut, leftWing, rightWing);
@@ -228,7 +228,7 @@ void opcontrol() {
 
 
 //functions for op control
-void arcade(std::shared_ptr<ChassisController> drive, Controller &controller) {
+void arcadeDrive(std::shared_ptr<ChassisController> drive, Controller &controller) {
 	//handles driving
 	drive->getModel()->arcade(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::leftX));
 
