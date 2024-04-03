@@ -59,14 +59,14 @@ void initialize() {
 	//general
 	ports.intake = 5;
 	ports.flywheel = 7;
-	ports.leftWing = 3;
-	ports.rightWing = 5;
+	ports.leftWing = -3;
+	ports.rightWing = 8;
 
 	//chassis
-	ports.topLeftMotor = 2;
+	ports.topLeftMotor = -2;
 	ports.topRightMotor = 9;
 	ports.bottomRightMotor = 10;
-	ports.bottomLeftMotor = 1;
+	ports.bottomLeftMotor = -1;
 
 	//sensors
 	ports.gps = 11;
@@ -272,10 +272,16 @@ void wingHandling(ControllerButton &wingsIn, ControllerButton &wingsOut, Motor &
 		rightWing.moveVelocity(200);
 	}
 
-	if(wingsOut.isPressed()) {
+	else if(wingsOut.isPressed()) {
 		leftWing.moveVelocity(-200);
 		rightWing.moveVelocity(-200);
 	}
+	
+	else {
+		leftWing.moveVelocity(0);
+		rightWing.moveVelocity(0);
+	}
+
 }
 
 void testAutoInitiate(ControllerButton &testAuto) {
