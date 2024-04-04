@@ -3,7 +3,7 @@
 using namespace std;
 
 //opcontrol declerations
-void arcade(std::shared_ptr<ChassisController> drive, Controller &controller);
+void arcadeDrive(std::shared_ptr<ChassisController> drive, Controller &controller);
 void flywheelHandling(ControllerButton &flywheelSpinIn, ControllerButton &flywheelSpinOut, Motor &flywheel);
 void intakeHandling(ControllerButton &intakeIn, ControllerButton &intakeOut, Motor &intake);
 void wingHandling(ControllerButton &wingsIn, ControllerButton &wingsOut, Motor &leftWing, Motor &rightWing);
@@ -58,18 +58,18 @@ void initialize() {
 
 	//general
 	ports.intake = 5;
-	ports.flywheel = 6;
-	ports.leftWing = 7;
+	ports.flywheel = 7;
+	ports.leftWing = -3;
 	ports.rightWing = 8;
 
 	//chassis
-	ports.topLeftMotor = 1;
-	ports.topRightMotor = 2;
-	ports.bottomRightMotor = 3;
-	ports.bottomLeftMotor = 4;
+	ports.topLeftMotor = -2;
+	ports.topRightMotor = 9;
+	ports.bottomRightMotor = 10;
+	ports.bottomLeftMotor = -1;
 
 	//sensors
-	ports.gps = 9;
+	ports.gps = 11;
 
 	//for lcd screen
 	pros::lcd::initialize();
@@ -122,7 +122,7 @@ void autonomous() {
 
 	//Chassis decleration
 	std::shared_ptr<OdomChassisController> drive = ChassisControllerBuilder()
-		.withMotors(ports.topLeftMotor, ports.topRightMotor, ports.bottomRightMotor, ports.bottomLeftMotor)
+		.withMotors({ports.topLeftMotor, ports.bottomLeftMotor}, {ports.topRightMotor, ports.bottomRightMotor}) //https://www.vexforum.com/t/okapilib-turning-incorrect-angle/86794
 		// Green gearset, 4 in wheel diam, 11.5 in wheel track
 		.withDimensions(AbstractMotor::gearset::green*(60.0/36.0), {{4_in, 11.751_in}, imev5GreenTPR})
 		.withOdometry(StateMode::FRAME_TRANSFORMATION)
@@ -202,14 +202,14 @@ void opcontrol() {
 
 	//Chassis decleration
 	std::shared_ptr<ChassisController> drive = ChassisControllerBuilder()
-		.withMotors(ports.topLeftMotor, ports.topRightMotor, ports.bottomRightMotor, ports.bottomLeftMotor)
+		.withMotors({ports.topLeftMotor, ports.bottomLeftMotor}, {ports.topRightMotor, ports.bottomRightMotor}) //https://www.vexforum.com/t/okapilib-turning-incorrect-angle/86794
 		// Green gearset, 4 in wheel diam, 11.5 in wheel track
 		.withDimensions(AbstractMotor::gearset::green*(60.0/36.0), {{4_in, 11.751_in}, imev5GreenTPR})
 		.build();
 
 	//main loop
 	while (true) {
-		arcade(drive, controller);
+		arcadeDrive(drive, controller);
 		flywheelHandling(flywheelSpinIn, flywheelSpinOut, flywheel); 
 		intakeHandling(intakeIn, intakeOut, intake);
 		wingHandling(wingsIn, wingsOut, leftWing, rightWing);
@@ -228,9 +228,9 @@ void opcontrol() {
 
 
 //functions for op control
-void arcade(std::shared_ptr<ChassisController> drive, Controller &controller) {
+void arcadeDrive(std::shared_ptr<ChassisController> drive, Controller &controller) {
 	//handles driving
-	drive->getModel()->arcade(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::leftX));
+	drive->getModel()->arcade(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::rightX));
 
 }
 
@@ -272,10 +272,16 @@ void wingHandling(ControllerButton &wingsIn, ControllerButton &wingsOut, Motor &
 		rightWing.moveVelocity(200);
 	}
 
-	if(wingsOut.isPressed()) {
+	else if(wingsOut.isPressed()) {
 		leftWing.moveVelocity(-200);
 		rightWing.moveVelocity(-200);
 	}
+	
+	else {
+		leftWing.moveVelocity(0);
+		rightWing.moveVelocity(0);
+	}
+
 }
 
 void testAutoInitiate(ControllerButton &testAuto) {
