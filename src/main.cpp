@@ -394,7 +394,7 @@ void resetGPS(pros::Gps &gps, std::shared_ptr<OdomChassisController> drive) {
 	//This function checks the current position with the gps, and sets that as the Odom state.
 	//https://pros.cs.purdue.edu/v5/tutorials/topical/gps.html gps guide
 	//https://www.vexforum.com/t/using-okapi-units/83933 convert double to qlength or some other units.
-	pros::delay(1000); //Has to stop for one second to get accurate reading.
+	pros::delay(2000); //Has to stop for one second to get accurate reading.
 	pros::c::gps_status_s_t gpsData; //define a strut
 	gpsData = gps.get_status();
 
