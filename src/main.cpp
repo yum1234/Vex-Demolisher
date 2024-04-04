@@ -13,6 +13,7 @@ void testAutoInitiate(ControllerButton &testAuto);
 void openWings(std::shared_ptr<AsyncPositionController<double, double>> leftWing, std::shared_ptr<AsyncPositionController<double, double>> rightWing);
 void closeWings(std::shared_ptr<AsyncPositionController<double, double>> leftWing, std::shared_ptr<AsyncPositionController<double, double>> rightWing);
 void waitWings(std::shared_ptr<AsyncPositionController<double, double>> leftWing, std::shared_ptr<AsyncPositionController<double, double>> rightWing);
+void resetGPS(pros::Gps &gps, std::shared_ptr<OdomChassisController> drive);
 
 struct {
 	//chassis
@@ -125,7 +126,7 @@ void autonomous() {
 		.withMotors({ports.topLeftMotor, ports.bottomLeftMotor}, {ports.topRightMotor, ports.bottomRightMotor}) //https://www.vexforum.com/t/okapilib-turning-incorrect-angle/86794
 		// Green gearset, 4 in wheel diam, 11.5 in wheel track
 		.withDimensions(AbstractMotor::gearset::green*(60.0/36.0), {{4_in, 11.751_in}, imev5GreenTPR})
-		.withOdometry(StateMode::FRAME_TRANSFORMATION)
+		.withOdometry(StateMode::CARTESIAN)
 		.buildOdometry();
 
 	//async motor declerations
@@ -152,10 +153,68 @@ void autonomous() {
 		pros::c::gps_status_s_t gpsData; 
 
 	//main process
-	drive->moveDistance(30_in);
+
+	//Turning right and moving a bit to allow the gps to reset odometry frame
+	drive->turnToAngle(90_deg);
+	drive->moveDistance(10_in);
+	resetGPS(gps, drive);
+
+	//Going to match load zone
+	drive->driveToPoint({-1200_mm, 1200_mm});
+	drive->turnToAngle(135_deg);
+	drive->moveDistance(-12_in);
+
+	//pushing balls in front
 	openWings(leftWing, rightWing);
-	waitWings(leftWing, rightWing);
-	drive->moveDistance(20_in);
+		//smashes into middle bar and hopefully straightens out
+	drive->moveDistance(90_in);
+	closeWings(leftWing, rightWing);
+	resetGPS(gps, drive);
+
+	//goes back to match load zone
+	drive->moveDistance(-10_in);
+	drive->driveToPoint({-1200_mm, 1200_mm});
+
+	//Goes through top passage way
+	drive->driveToPoint({-900_mm, 1500_mm});
+	drive->turnToAngle(90_deg);
+	resetGPS(gps, drive);
+	drive->driveToPoint({900_mm, 1500_mm});
+	resetGPS(gps, drive);
+
+	//Going into other court
+		//Goes to square below
+	drive->driveToPoint({900_mm, 900_mm});
+	resetGPS(gps, drive);
+		//Goes inside court
+	drive->driveToPoint({300_mm, 900_mm});
+	resetGPS(gps, drive);
+	drive->turnToAngle(180_deg);
+		//drives down court to the middle
+	openWings(leftWing, rightWing);
+	drive->driveToPoint({300_mm, 0_mm});
+	resetGPS(gps, drive);
+		//Turns towards goal
+	drive->turnToAngle(90_deg);
+		//slams into goal
+	drive->moveDistance(50_in);
+	closeWings(leftWing, rightWing);
+		//reverses
+	drive->moveDistance(-50_in);
+	resetGPS(gps, drive);
+		//Goes down other half of court
+	drive->turnToAngle(180_deg);
+	drive->driveToPoint({300_mm, -900_mm});
+	resetGPS(gps, drive);
+		//turns toward goal
+	drive->turnToAngle(90_deg);
+	drive->moveDistance(50_in);
+	
+
+	
+
+	
+
 
 }
 
@@ -314,6 +373,7 @@ void moveCood(pros::Gps &gps, std::shared_ptr<OdomChassisController> drive, doub
 	//Then it goes to use that difference and add it to the odometry, and sets that as the point to move towards.
 	//Inches only!!!
 	//https://www.vexforum.com/t/using-okapi-units/83933 convert double to qlength or some other units.
+	//NOTE!!! THIS FUNCTION IS DEPRECATED
 	pros::c::gps_status_s_t gpsData; //define a strut
 	gpsData = gps.get_status();
 
@@ -327,5 +387,18 @@ void moveCood(pros::Gps &gps, std::shared_ptr<OdomChassisController> drive, doub
 
 	drive->driveToPoint({relativeX + diffX, relativeY + diffY});
 	drive->turnToAngle(relativeAngle + diffAngle);
+
+}
+
+void resetGPS(pros::Gps &gps, std::shared_ptr<OdomChassisController> drive) {
+	//This function checks the current position with the gps, and sets that as the Odom state.
+	//https://pros.cs.purdue.edu/v5/tutorials/topical/gps.html gps guide
+	//https://www.vexforum.com/t/using-okapi-units/83933 convert double to qlength or some other units.
+	pros::c::gps_status_s_t gpsData; //define a strut
+	gpsData = gps.get_status();
+
+	
+	drive->setState({gpsData.x*1_m, gpsData.y*1_m, gps.get_heading()*1_deg}); //https://okapilib.github.io/OkapiLib/md_docs_tutorials_walkthrough_odometry.html
+
 
 }
