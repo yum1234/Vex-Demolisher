@@ -149,7 +149,7 @@ void autonomous() {
 
 	//sensors declerations
 		//GPS
-		pros::GPS gps(ports.gps);
+		pros::GPS gps(ports.gps, -3_in, 0_in);
 		pros::c::gps_status_s_t gpsData; 
 
 	//main process
