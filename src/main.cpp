@@ -291,8 +291,28 @@ void opcontrol() {
 //functions for op control
 void arcadeDrive(std::shared_ptr<ChassisController> drive, Controller &controller) {
 	//handles driving
-	drive->getModel()->driveVector(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::rightX));
+	
+	drive->getModel()->driveVector(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::rightX)); //uses velocity mode but still off
+	
+	//below is deprecated code
+	//double pidConstant; //This is because the bot has slightly more power on the right rather then the left. So we are going to decrease the right.
+	
+		
+	
+	//double leftAnalog = controller.getAnalog(ControllerAnalog::leftY); //gets control inputs at particular input
+	//double rightAnalog = controller.getAnalog(ControllerAnalog::rightX);
 
+	/*
+	if(leftAnalog > 0.02 || rightAnalog > 0.02) { //.02 instead of 0 to account for the deadzone on the sticks of the controller.
+		pidConstant = 0.1; //This is nesscary else the bot will be always moving despite no input. Only when positive power is applied the bot should counteract that power.
+	} else {
+		pidConstant = 0;
+	}
+	*/
+
+
+	//drive->getModel()->left(leftAnalog + rightAnalog); 
+	//drive->getModel()->right(leftAnalog - rightAnalog - pidConstant);
 }
 
 void flywheelHandling(ControllerButton &flywheelSpinIn, ControllerButton &flywheelSpinOut, Motor &flywheel) {
