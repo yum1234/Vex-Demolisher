@@ -149,7 +149,9 @@ void autonomous() {
 
 	//sensors declerations
 		//GPS
-		pros::GPS gps(ports.gps, -3_in, 0_in);
+        double xOffset = -3; //Offset for the GPS from center of rotation
+        double yOffset = 0;
+		pros::GPS gps(ports.gps, xOffset, yOffset);
 		pros::c::gps_status_s_t gpsData; 
 
 	//main process
