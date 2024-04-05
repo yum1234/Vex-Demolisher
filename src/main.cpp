@@ -289,7 +289,7 @@ void opcontrol() {
 //functions for op control
 void arcadeDrive(std::shared_ptr<ChassisController> drive, Controller &controller) {
 	//handles driving
-	drive->getModel()->arcade(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::rightX));
+	drive->getModel()->driveVector(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::rightX));
 
 }
 
