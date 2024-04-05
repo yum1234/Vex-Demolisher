@@ -235,7 +235,7 @@ void opcontrol() {
 	//Controller declerations
 	Controller controller;
 		//for flywhel
-	ControllerButton flywheelSpinIn(ControllerDigital::A);
+	ControllerButton flywheelSpinIn(ControllerDigital::X);
 	ControllerButton flywheelSpinOut(ControllerDigital::B);
 		//for intake
 	ControllerButton intakeIn(ControllerDigital::R1);
@@ -244,7 +244,7 @@ void opcontrol() {
 	ControllerButton wingsIn(ControllerDigital::L1);
 	ControllerButton wingsOut(ControllerDigital::L2);
 		//for testing autonomous control
-	ControllerButton testAuto(ControllerDigital::X);
+	ControllerButton testAuto(ControllerDigital::Y);
 
 
 	//motor declerations
